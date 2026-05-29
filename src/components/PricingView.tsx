@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageType } from '../types';
 
 interface PricingViewProps {
@@ -20,6 +20,25 @@ export default function PricingView({
   const [activeCategory, setActiveCategory] = useState<'ai' | 'standard' | 'brand'>(preselectedCategory || 'ai');
   const [activeAiSub, setActiveAiSub] = useState<'employees' | 'marketing' | 'ops'>(preselectedAiSub || 'employees');
   const [activeBrandSub, setActiveBrandSub] = useState<'identity' | 'merch'>(preselectedBrandSub || 'identity');
+
+  // Sync props to state if they change
+  useEffect(() => {
+    if (preselectedCategory) {
+      setActiveCategory(preselectedCategory);
+    }
+  }, [preselectedCategory]);
+
+  useEffect(() => {
+    if (preselectedAiSub) {
+      setActiveAiSub(preselectedAiSub);
+    }
+  }, [preselectedAiSub]);
+
+  useEffect(() => {
+    if (preselectedBrandSub) {
+      setActiveBrandSub(preselectedBrandSub);
+    }
+  }, [preselectedBrandSub]);
 
   // Hover states for temporary preview logic
   const [hoveredCategory, setHoveredCategory] = useState<'ai' | 'standard' | 'brand' | null>(null);

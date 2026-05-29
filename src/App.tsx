@@ -33,6 +33,59 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Sync page & pricing tab filters with URL query parameters on initial mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Support either ?page=... or ?tab=...
+    const pageParam = (params.get('page') || params.get('tab'))?.toLowerCase() as PageType | null;
+    const categoryParam = params.get('category')?.toLowerCase();
+    const subParam = (params.get('sub') || params.get('subcategory'))?.toLowerCase();
+    const serviceParam = params.get('service')?.toLowerCase();
+    
+    const validPages: PageType[] = ['home', 'services', 'portfolio', 'pricing', 'contact'];
+    
+    let targetPage: PageType = 'home';
+    if (pageParam && validPages.includes(pageParam)) {
+      targetPage = pageParam;
+    } else if (categoryParam || subParam || serviceParam) {
+      // Default to pricing if deep-linking parameters exist but no page is specified
+      targetPage = 'pricing';
+    } else {
+      return; // No params, keep initial state
+    }
+
+    if (categoryParam || subParam || serviceParam) {
+      const allowedCategories: ('ai' | 'standard' | 'brand')[] = ['ai', 'standard', 'brand'];
+      const allowedAiSubs: ('employees' | 'marketing' | 'ops')[] = ['employees', 'marketing', 'ops'];
+      const allowedBrandSubs: ('identity' | 'merch')[] = ['identity', 'merch'];
+
+      let category: 'ai' | 'standard' | 'brand' = 'ai';
+      let sub: any = undefined;
+
+      if (categoryParam && allowedCategories.includes(categoryParam as any)) {
+        category = categoryParam as any;
+      }
+
+      const targetSub = subParam || serviceParam;
+      if (targetSub) {
+        if (allowedAiSubs.includes(targetSub as any)) {
+          category = 'ai';
+          sub = targetSub;
+        } else if (allowedBrandSubs.includes(targetSub as any)) {
+          category = 'brand';
+          sub = targetSub;
+        } else if (targetSub === 'website' || targetSub === 'host' || targetSub === 'hosting' || targetSub === 'standard') {
+          category = 'standard';
+        }
+      }
+
+      setPricingFilters({ category, sub });
+    }
+
+    setActiveTab(targetPage);
+  }, []);
+
   // Pricing tab deep-linking state
   const [pricingFilters, setPricingFilters] = useState<{
     category: 'ai' | 'standard' | 'brand';
