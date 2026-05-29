@@ -2,10 +2,11 @@ import { PageType } from '../types';
 
 interface ServicesViewProps {
   onNavigate: (page: PageType) => void;
+  onNavigateToPricing?: (category: 'ai' | 'standard' | 'brand', sub?: 'employees' | 'marketing' | 'ops' | 'identity' | 'merch') => void;
   onOpenConsultation: (service?: string) => void;
 }
 
-export default function ServicesView({ onNavigate, onOpenConsultation }: ServicesViewProps) {
+export default function ServicesView({ onNavigate, onNavigateToPricing, onOpenConsultation }: ServicesViewProps) {
 
   const serviceItems = [
     {
@@ -15,7 +16,8 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       description: 'Custom-crafted, lightning-fast interfaces designed to turn traffic into paying users, optimized for desktop and mobile devices.',
       actionLabel: 'Build Custom Website',
       serviceId: 'Website Design',
-      tag: 'Core Platform'
+      tag: 'Core Platform',
+      pricingCategory: 'standard' as const
     },
     {
       title: 'Web Hosting & Maintenance',
@@ -24,7 +26,8 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       description: 'Secure, high-availability production deployment pipelines combined with domain routing, SSL administration, and continuous maintenance.',
       actionLabel: 'Set Up Web Hosting',
       serviceId: 'Web Hosting',
-      tag: 'Infrastructure'
+      tag: 'Infrastructure',
+      pricingCategory: 'standard' as const
     },
     {
       title: 'AI Employees',
@@ -34,7 +37,9 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       actionLabel: 'Hire AI Employees',
       serviceId: 'AI Employees',
       tag: 'Best Seller',
-      primaryBtn: true
+      primaryBtn: true,
+      pricingCategory: 'ai' as const,
+      pricingSub: 'employees' as const
     },
     {
       title: 'AI Sales & Marketing',
@@ -43,7 +48,9 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       description: 'Empower your outreach and conversion channels with smart CRM pipelines, auto-replies, and highly optimized marketing campaigns.',
       actionLabel: 'Automate Sales System',
       serviceId: 'Sales and Marketing AI',
-      tag: 'Grow Business'
+      tag: 'Grow Business',
+      pricingCategory: 'ai' as const,
+      pricingSub: 'marketing' as const
     },
     {
       title: 'Operations & Analytics',
@@ -52,7 +59,9 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       description: 'Replace tedious labor with trigger-based background workflow automations, beautiful metrics dashboards, and operations reporting.',
       actionLabel: 'Deploy Workflows',
       serviceId: 'Operations and Workflows',
-      tag: 'Efficiency'
+      tag: 'Efficiency',
+      pricingCategory: 'ai' as const,
+      pricingSub: 'ops' as const
     },
     {
       title: 'Brand Identity',
@@ -61,16 +70,20 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
       description: 'Build an elegant, professional presence from day one with high-contrast logos, comprehensive corporate style guides, and master design guidelines.',
       actionLabel: 'Rebrand Your Presence',
       serviceId: 'Brand Identity Design',
-      tag: 'Creative Identity'
+      tag: 'Creative Identity',
+      pricingCategory: 'brand' as const,
+      pricingSub: 'identity' as const
     },
     {
       title: 'Branded Merchandise',
       icon: 'apparel',
       bgColor: 'bg-cyan-50 text-cyan-800',
-      description: 'Design, sell, or distribute custom-branded merchandise worldwide via smooth print-on-demand store integrations requiring zero upfront inventory.',
-      actionLabel: 'Launch Merch Store',
+      description: 'Design, sell, or distribute custom-branded merchandise worldwide via smooth print-on-demand merch integrations requiring zero upfront inventory.',
+      actionLabel: 'Launch Branded Merch',
       serviceId: 'Custom Merchandise Production',
-      tag: 'Passive Revenue'
+      tag: 'Passive Revenue',
+      pricingCategory: 'brand' as const,
+      pricingSub: 'merch' as const
     }
   ];
 
@@ -143,7 +156,13 @@ export default function ServicesView({ onNavigate, onOpenConsultation }: Service
                   {svc.actionLabel}
                 </button>
                 <button
-                  onClick={() => onNavigate('pricing')}
+                  onClick={() => {
+                    if (onNavigateToPricing) {
+                      onNavigateToPricing(svc.pricingCategory, svc.pricingSub);
+                    } else {
+                      onNavigate('pricing');
+                    }
+                  }}
                   className="px-4 py-3.5 rounded-xl font-sans font-semibold text-xs text-gray-500 hover:text-[#001f41] hover:bg-gray-50 border border-gray-250 transition-colors cursor-pointer"
                 >
                   View Tier Pricing

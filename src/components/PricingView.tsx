@@ -4,13 +4,22 @@ import { PageType } from '../types';
 interface PricingViewProps {
   onNavigate: (page: PageType) => void;
   onOpenConsultation: (service?: string, budget?: string) => void;
+  preselectedCategory?: 'ai' | 'standard' | 'brand';
+  preselectedAiSub?: 'employees' | 'marketing' | 'ops';
+  preselectedBrandSub?: 'identity' | 'merch';
 }
 
-export default function PricingView({ onNavigate, onOpenConsultation }: PricingViewProps) {
+export default function PricingView({
+  onNavigate,
+  onOpenConsultation,
+  preselectedCategory,
+  preselectedAiSub,
+  preselectedBrandSub
+}: PricingViewProps) {
   // Toggle between 'ai' (default), 'standard' and 'brand' website/merch packages
-  const [activeCategory, setActiveCategory] = useState<'ai' | 'standard' | 'brand'>('ai');
-  const [activeAiSub, setActiveAiSub] = useState<'employees' | 'marketing' | 'ops'>('employees');
-  const [activeBrandSub, setActiveBrandSub] = useState<'identity' | 'merch'>('identity');
+  const [activeCategory, setActiveCategory] = useState<'ai' | 'standard' | 'brand'>(preselectedCategory || 'ai');
+  const [activeAiSub, setActiveAiSub] = useState<'employees' | 'marketing' | 'ops'>(preselectedAiSub || 'employees');
+  const [activeBrandSub, setActiveBrandSub] = useState<'identity' | 'merch'>(preselectedBrandSub || 'identity');
 
   // Hover states for temporary preview logic
   const [hoveredCategory, setHoveredCategory] = useState<'ai' | 'standard' | 'brand' | null>(null);
@@ -117,7 +126,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
         'Everything in Plus, plus:',
         'Up to 10 pages',
         'Online store / e-commerce',
-        'Booking & appointment system (Calendly embed)',
+        'Booking & appointment system',
         'Speed & performance optimization',
         'Google Analytics advanced setup',
         'WhatsApp chat button',
@@ -489,7 +498,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
           >
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-display text-base font-bold text-[#001f41]">✨ AI Add-ons &amp; Automation</span>
+                <span className="font-display text-base font-bold text-[#001f41]">AI Add-ons &amp; Automation</span>
               </div>
               <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                 Extend your business with AI that handles real tasks
@@ -517,7 +526,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
           >
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-display text-base font-bold text-[#001f41]">🎨 Brand &amp; Merchandise</span>
+                <span className="font-display text-base font-bold text-[#001f41]">Brand &amp; Merchandise</span>
               </div>
               <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                 Build a strong brand and turn it into physical presence
@@ -545,7 +554,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
           >
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-display text-base font-bold text-[#001f41]">🌐 Website Packages</span>
+                <span className="font-display text-base font-bold text-[#001f41]">Website Packages</span>
               </div>
               <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                 Get a fast, modern website that actually converts visitors
@@ -592,7 +601,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-display text-base font-bold text-[#001f41]">1. 🤖 AI Employees</span>
+                      <span className="font-display text-base font-bold text-[#001f41]">1. AI Employees</span>
                     </div>
                     <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                       Turn visitors into customers automatically
@@ -620,7 +629,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-display text-base font-bold text-[#001f41]">2. 📈 Sales &amp; Marketing</span>
+                      <span className="font-display text-base font-bold text-[#001f41]">2. Sales &amp; Marketing</span>
                     </div>
                     <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                       Get more leads and convert them faster
@@ -648,7 +657,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-display text-base font-bold text-[#001f41]">3. ⚙️ Operations &amp; Analytics</span>
+                      <span className="font-display text-base font-bold text-[#001f41]">3. Operations &amp; Analytics</span>
                     </div>
                     <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                       Run your business on autopilot
@@ -883,7 +892,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
               >
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-display text-base font-bold text-[#001f41]">🎨 Brand Identity</span>
+                    <span className="font-display text-base font-bold text-[#001f41]">Brand Identity</span>
                   </div>
                   <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                     Look like a real, established brand from day one
@@ -911,7 +920,7 @@ export default function PricingView({ onNavigate, onOpenConsultation }: PricingV
               >
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-display text-base font-bold text-[#001f41]">👕 Branded Merchandise</span>
+                    <span className="font-display text-base font-bold text-[#001f41]">Branded Merchandise</span>
                   </div>
                   <h3 className="font-sans text-xs font-semibold text-gray-800 leading-tight mb-2">
                     Turn your brand into physical products people remember

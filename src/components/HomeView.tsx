@@ -72,9 +72,14 @@ export default function HomeView({ onNavigate, onOpenConsultation }: HomeViewPro
                   Custom-crafted, lightning-fast interfaces designed to turn traffic into paying users.
                 </p>
               </div>
-              <span className="text-xs text-[#7b581d] font-semibold group-hover:underline inline-flex items-center gap-1">
-                Learn more <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </span>
+              <div className="inline-flex items-center gap-1 text-xs text-[#7b581d] font-semibold">
+                <span className="group-hover:underline">
+                  Learn more
+                </span>
+                <span className="material-symbols-outlined text-sm">
+                  arrow_forward
+                </span>
+              </div>
             </div>
 
             {/* Service 2 */}
@@ -91,9 +96,14 @@ export default function HomeView({ onNavigate, onOpenConsultation }: HomeViewPro
                   Secure, high-availability deployments, custom domain setup, routing & maintenance.
                 </p>
               </div>
-              <span className="text-xs text-[#7b581d] font-semibold group-hover:underline inline-flex items-center gap-1">
-                Learn more <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </span>
+              <div className="inline-flex items-center gap-1 text-xs text-[#7b581d] font-semibold">
+                <span className="group-hover:underline">
+                  Learn more
+                </span>
+                <span className="material-symbols-outlined text-sm">
+                  arrow_forward
+                </span>
+              </div>
             </div>
 
             {/* Service 3 */}
@@ -110,9 +120,14 @@ export default function HomeView({ onNavigate, onOpenConsultation }: HomeViewPro
                   Highly trained conversational agents working 24/7 to pre-qualify and capture leads.
                 </p>
               </div>
-              <span className="text-xs text-[#7b581d] font-semibold group-hover:underline inline-flex items-center gap-1">
-                Learn more <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </span>
+              <div className="inline-flex items-center gap-1 text-xs text-[#7b581d] font-semibold">
+                <span className="group-hover:underline">
+                  Learn more
+                </span>
+                <span className="material-symbols-outlined text-sm">
+                  arrow_forward
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -33,6 +33,20 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Pricing tab deep-linking state
+  const [pricingFilters, setPricingFilters] = useState<{
+    category: 'ai' | 'standard' | 'brand';
+    sub?: 'employees' | 'marketing' | 'ops' | 'identity' | 'merch';
+  } | null>(null);
+
+  const handleNavigateToPricing = (
+    category: 'ai' | 'standard' | 'brand',
+    sub?: 'employees' | 'marketing' | 'ops' | 'identity' | 'merch'
+  ) => {
+    setPricingFilters({ category, sub });
+    setActiveTab('pricing');
+  };
+
   // Global project modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalService, setModalService] = useState('');
@@ -152,7 +166,7 @@ export default function App() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {[
               { id: 'home', label: 'Home' },
               { id: 'services', label: 'Services' },
@@ -164,7 +178,12 @@ export default function App() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as PageType)}
+                  onClick={() => {
+                    if (tab.id === 'pricing') {
+                      setPricingFilters(null);
+                    }
+                    setActiveTab(tab.id as PageType);
+                  }}
                   className={`relative font-sans text-xs font-bold uppercase tracking-wider py-1 transition-all duration-200 ${
                     isActive
                       ? 'text-[#7b581d] border-b-2 border-[#7b581d]'
@@ -178,7 +197,7 @@ export default function App() {
           </div>
 
           {/* Header Action Button */}
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <button
               onClick={() => handleOpenConsultation()}
               className="bg-[#001f41] text-white hover:bg-[#0f3460] px-6 py-2.5 rounded-full font-sans text-xs font-bold uppercase tracking-wider transition-all duration-200 shadow hover:scale-105 active:scale-95"
@@ -191,7 +210,7 @@ export default function App() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             type="button"
-            className="md:hidden text-[#001f41] p-1.5 focus:outline-none"
+            className="lg:hidden text-[#001f41] p-1.5 focus:outline-none"
             aria-label="Toggle Navigation Menu"
           >
             <span className="material-symbols-outlined text-3xl">
@@ -203,7 +222,7 @@ export default function App() {
 
       {/* Mobile Navigation Drawer Panel */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 pt-20 bg-white/95 backdrop-blur-md flex flex-col items-center gap-6 animate-fade-in md:hidden border-b border-gray-100">
+        <div className="fixed inset-0 z-30 pt-20 bg-white/95 backdrop-blur-md flex flex-col items-center gap-6 animate-fade-in lg:hidden border-b border-gray-100">
           {[
             { id: 'home', label: 'Home' },
             { id: 'services', label: 'Services' },
@@ -216,6 +235,9 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => {
+                  if (tab.id === 'pricing') {
+                    setPricingFilters(null);
+                  }
                   setActiveTab(tab.id as PageType);
                   setIsMobileMenuOpen(false);
                 }}
@@ -245,13 +267,23 @@ export default function App() {
           <HomeView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
         )}
         {activeTab === 'services' && (
-          <ServicesView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
+          <ServicesView
+            onNavigate={setActiveTab}
+            onNavigateToPricing={handleNavigateToPricing}
+            onOpenConsultation={handleOpenConsultation}
+          />
         )}
         {activeTab === 'portfolio' && (
           <PortfolioView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
         )}
         {activeTab === 'pricing' && (
-          <PricingView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
+          <PricingView
+            onNavigate={setActiveTab}
+            onOpenConsultation={handleOpenConsultation}
+            preselectedCategory={pricingFilters?.category}
+            preselectedAiSub={pricingFilters?.sub as any}
+            preselectedBrandSub={pricingFilters?.sub as any}
+          />
         )}
 
         {activeTab === 'contact' && (
