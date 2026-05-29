@@ -33,64 +33,110 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Sync page & pricing tab filters with URL query parameters on initial mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    
-    // Support either ?page=... or ?tab=...
-    const pageParam = (params.get('page') || params.get('tab'))?.toLowerCase() as PageType | null;
-    const categoryParam = params.get('category')?.toLowerCase();
-    const subParam = (params.get('sub') || params.get('subcategory'))?.toLowerCase();
-    const serviceParam = params.get('service')?.toLowerCase();
-    
-    const validPages: PageType[] = ['home', 'services', 'portfolio', 'pricing', 'contact'];
-    
-    let targetPage: PageType = 'home';
-    if (pageParam && validPages.includes(pageParam)) {
-      targetPage = pageParam;
-    } else if (categoryParam || subParam || serviceParam) {
-      // Default to pricing if deep-linking parameters exist but no page is specified
-      targetPage = 'pricing';
-    } else {
-      return; // No params, keep initial state
-    }
-
-    if (categoryParam || subParam || serviceParam) {
-      const allowedCategories: ('ai' | 'standard' | 'brand')[] = ['ai', 'standard', 'brand'];
-      const allowedAiSubs: ('employees' | 'marketing' | 'ops')[] = ['employees', 'marketing', 'ops'];
-      const allowedBrandSubs: ('identity' | 'merch')[] = ['identity', 'merch'];
-
-      let category: 'ai' | 'standard' | 'brand' = 'ai';
-      let sub: any = undefined;
-
-      if (categoryParam && allowedCategories.includes(categoryParam as any)) {
-        category = categoryParam as any;
-      }
-
-      const targetSub = subParam || serviceParam;
-      if (targetSub) {
-        if (allowedAiSubs.includes(targetSub as any)) {
-          category = 'ai';
-          sub = targetSub;
-        } else if (allowedBrandSubs.includes(targetSub as any)) {
-          category = 'brand';
-          sub = targetSub;
-        } else if (targetSub === 'website' || targetSub === 'host' || targetSub === 'hosting' || targetSub === 'standard') {
-          category = 'standard';
-        }
-      }
-
-      setPricingFilters({ category, sub });
-    }
-
-    setActiveTab(targetPage);
-  }, []);
-
   // Pricing tab deep-linking state
   const [pricingFilters, setPricingFilters] = useState<{
     category: 'ai' | 'standard' | 'brand';
     sub?: 'employees' | 'marketing' | 'ops' | 'identity' | 'merch';
   } | null>(null);
+
+  // Sync page & pricing tab filters with URL path and query parameters
+  useEffect(() => {
+    const handleUrlSync = () => {
+      const pathname = window.location.pathname;
+      const params = new URLSearchParams(window.location.search);
+      
+      const segments = pathname.split('/').filter(Boolean);
+      // Determine page from pathname last segment (supporting base paths like GitHub Pages repos)
+      const lastSegment = segments.length > 0 ? segments[segments.length - 1].toLowerCase() : 'home';
+      
+      const validPages: PageType[] = ['home', 'services', 'portfolio', 'pricing', 'contact'];
+      
+      let targetPage: PageType = 'home';
+      if (validPages.includes(lastSegment as PageType)) {
+        targetPage = lastSegment as PageType;
+      } else {
+        const pageParam = (params.get('page') || params.get('tab'))?.toLowerCase() as PageType | null;
+        if (pageParam && validPages.includes(pageParam)) {
+          targetPage = pageParam;
+        }
+      }
+
+      const categoryParam = params.get('category')?.toLowerCase();
+      const subParam = (params.get('sub') || params.get('subcategory'))?.toLowerCase();
+      const serviceParam = params.get('service')?.toLowerCase();
+
+      if (categoryParam || subParam || serviceParam || targetPage === 'pricing') {
+        const allowedCategories: ('ai' | 'standard' | 'brand')[] = ['ai', 'standard', 'brand'];
+        const allowedAiSubs: ('employees' | 'marketing' | 'ops')[] = ['employees', 'marketing', 'ops'];
+        const allowedBrandSubs: ('identity' | 'merch')[] = ['identity', 'merch'];
+
+        let category: 'ai' | 'standard' | 'brand' = 'ai';
+        let sub: any = undefined;
+
+        if (categoryParam && allowedCategories.includes(categoryParam as any)) {
+          category = categoryParam as any;
+        }
+
+        const targetSub = subParam || serviceParam;
+        if (targetSub) {
+          if (allowedAiSubs.includes(targetSub as any)) {
+            category = 'ai';
+            sub = targetSub;
+          } else if (allowedBrandSubs.includes(targetSub as any)) {
+            category = 'brand';
+            sub = targetSub;
+          } else if (targetSub === 'website' || targetSub === 'host' || targetSub === 'hosting' || targetSub === 'standard') {
+            category = 'standard';
+          }
+        }
+
+        setPricingFilters({ category, sub });
+      } else {
+        setPricingFilters(null);
+      }
+
+      setActiveTab(targetPage);
+    };
+
+    handleUrlSync();
+
+    // Listen to Back/Forward navigation buttons
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
+  }, []);
+
+  const handleSetActiveTab = (tab: PageType, clearPricingFilters = true) => {
+    if (clearPricingFilters && tab !== 'pricing') {
+      setPricingFilters(null);
+    }
+    setActiveTab(tab);
+
+    // Update browser URL dynamic path
+    const url = new URL(window.location.href);
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    const defaultPages = ['home', 'services', 'portfolio', 'pricing', 'contact'];
+    
+    if (pathSegments.length > 0 && defaultPages.includes(pathSegments[pathSegments.length - 1])) {
+      pathSegments.pop();
+    }
+    
+    if (tab !== 'home') {
+      pathSegments.push(tab);
+    }
+    
+    url.pathname = '/' + pathSegments.join('/');
+
+    // Clear search query parameters unless we are staying on pricing tab
+    if (tab !== 'pricing') {
+      url.search = '';
+    }
+
+    try {
+      window.history.pushState({ tab }, '', url.toString());
+    } catch (e) {
+      console.warn("History pushstate skipped", e);
+    }
+  };
 
   const handleNavigateToPricing = (
     category: 'ai' | 'standard' | 'brand',
@@ -98,6 +144,29 @@ export default function App() {
   ) => {
     setPricingFilters({ category, sub });
     setActiveTab('pricing');
+
+    const url = new URL(window.location.href);
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    const defaultPages = ['home', 'services', 'portfolio', 'pricing', 'contact'];
+    
+    if (pathSegments.length > 0 && defaultPages.includes(pathSegments[pathSegments.length - 1])) {
+      pathSegments.pop();
+    }
+    pathSegments.push('pricing');
+    url.pathname = '/' + pathSegments.join('/');
+
+    url.searchParams.set('category', category);
+    if (sub) {
+      url.searchParams.set('sub', sub);
+    } else {
+      url.searchParams.delete('sub');
+    }
+
+    try {
+      window.history.pushState({ tab: 'pricing' }, '', url.toString());
+    } catch (e) {
+      console.warn("History pushstate skipped", e);
+    }
   };
 
   // Global project modal state
@@ -194,7 +263,7 @@ export default function App() {
   };
 
   const handleQuickTabRedirect = (tab: PageType) => {
-    setActiveTab(tab);
+    handleSetActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -232,10 +301,7 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => {
-                    if (tab.id === 'pricing') {
-                      setPricingFilters(null);
-                    }
-                    setActiveTab(tab.id as PageType);
+                    handleSetActiveTab(tab.id as PageType, tab.id !== 'pricing');
                   }}
                   className={`relative font-sans text-xs font-bold uppercase tracking-wider py-1 transition-all duration-200 ${
                     isActive
@@ -288,10 +354,7 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => {
-                  if (tab.id === 'pricing') {
-                    setPricingFilters(null);
-                  }
-                  setActiveTab(tab.id as PageType);
+                  handleSetActiveTab(tab.id as PageType, tab.id !== 'pricing');
                   setIsMobileMenuOpen(false);
                 }}
                 className={`font-sans text-lg font-bold tracking-wider py-2 transition-all duration-200 ${
@@ -317,21 +380,21 @@ export default function App() {
       {/* Main Core Router View Wrapper */}
       <main className="flex-grow pt-24">
         {activeTab === 'home' && (
-          <HomeView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
+          <HomeView onNavigate={handleSetActiveTab} onOpenConsultation={handleOpenConsultation} />
         )}
         {activeTab === 'services' && (
           <ServicesView
-            onNavigate={setActiveTab}
+            onNavigate={handleSetActiveTab}
             onNavigateToPricing={handleNavigateToPricing}
             onOpenConsultation={handleOpenConsultation}
           />
         )}
         {activeTab === 'portfolio' && (
-          <PortfolioView onNavigate={setActiveTab} onOpenConsultation={handleOpenConsultation} />
+          <PortfolioView onNavigate={handleSetActiveTab} onOpenConsultation={handleOpenConsultation} />
         )}
         {activeTab === 'pricing' && (
           <PricingView
-            onNavigate={setActiveTab}
+            onNavigate={handleSetActiveTab}
             onOpenConsultation={handleOpenConsultation}
             preselectedCategory={pricingFilters?.category}
             preselectedAiSub={pricingFilters?.sub as any}
@@ -341,7 +404,7 @@ export default function App() {
 
         {activeTab === 'contact' && (
           <ContactView
-            onNavigate={setActiveTab}
+            onNavigate={handleSetActiveTab}
             preselectedService={modalService}
             preselectedBudget={modalBudget}
           />
