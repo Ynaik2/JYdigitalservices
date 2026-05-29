@@ -120,7 +120,7 @@ export default function PricingView({
       popular: true,
       features: [
         'Everything in Basic, plus:',
-        'Contact / quote form (goes straight to client\'s email)',
+        'Contact / quote form (straight to your email)',
         'Google Analytics installed',
         'Basic SEO setup',
         'Cookie consent banner',
@@ -144,7 +144,6 @@ export default function PricingView({
       features: [
         'Everything in Plus, plus:',
         'Up to 10 pages',
-        'Online store / e-commerce',
         'Booking & appointment system',
         'Speed & performance optimization',
         'Google Analytics advanced setup',
